@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>אוֹתִיּוֹת וְקַסְמִים - לומדים לקרוא בכיף | כיתות א׳-ב׳</title>
+    <meta name="description" content="אפליקציה חינוכית ומשחקית ללימוד קריאה בעברית לילדי כיתות א'-ב': אותיות, ניקוד, הברות, מילים וסיפורים קצרים.">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="אותיות וקסמים">
+    <link rel="apple-touch-icon" href="icon-512.svg">
+
+    <!-- קישור לסגנונות -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Favicon קסום -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦉</text></svg>">
+</head>
+<body>
+
+    <!-- קנבס לחגיגות קונפטי -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- סרגל עליון -->
+    <header class="app-header">
+        <div class="header-container">
+            <!-- לוגו האפליקציה -->
+            <div class="logo-area" onclick="app.showZone('letters')">
+                <div class="logo-icon">🦉</div>
+                <div class="logo-text">
+                    <h1>אוֹתִיּוֹת וְקַסְמִים</h1>
+                    <p>מַסָּע הַקְּרִיאָה שֶׁלִּי • כִּתּוֹת א׳-ב׳</p>
+                </div>
+            </div>
+
+            <!-- פרטי שחקן וכוכבים -->
+            <div class="player-stats" id="player-profile-trigger" title="לחצו לעריכת שם ודמות">
+                <div class="avatar-selector" id="current-avatar-btn">
+                    👦
+                </div>
+                <div class="player-info">
+                    <div class="player-name-row">
+                        <span class="player-name" id="player-name-display">הַקּוֹרֵא הָאַלּוּף</span>
+                        <span class="edit-icon-badge">✏️</span>
+                    </div>
+                    <div class="stars-counter">
+                        <span class="star-icon">⭐</span>
+                        <span id="stars-count">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- כפתורי שליטה מהירים -->
+            <div class="header-actions">
+                <button class="icon-btn" id="voice-settings-btn" title="בחירת קול ומבטא עברי">
+                    🗣️
+                </button>
+                <button class="icon-btn" id="sound-toggle-btn" title="הפעל/השתק צלילים">
+                    🔊
+                </button>
+                <button class="icon-btn" id="font-size-btn" title="שנה גודל כתב">
+                    Aa
+                </button>
+                <button class="icon-btn" id="niqqud-color-btn" title="הדגש ניקוד בצבע">
+                    🎨
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- תפריט לשוניות משחק ולימוד -->
+    <nav class="navigation-bar">
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-zone="letters">
+                <span class="tab-icon">🏰</span>
+                <span>אוֹתִיּוֹת וּצְלִילִים</span>
+            </button>
+            <button class="nav-tab" data-zone="vowels">
+                <span class="tab-icon">👑</span>
+                <span>מַמְלֶכֶת הַנִּיקּוּד</span>
+            </button>
+            <button class="nav-tab" data-zone="syllables">
+                <span class="tab-icon">🧩</span>
+                <span>מַרְכִּיב מִילִים</span>
+            </button>
+            <button class="nav-tab" data-zone="bubbles">
+                <span class="tab-icon">🫧</span>
+                <span>תְּפוֹס בּוּעָה</span>
+            </button>
+            <button class="nav-tab" data-zone="stories">
+                <span class="tab-icon">📚</span>
+                <span>סִפְרִיַּת סִפּוּרִים</span>
+            </button>
+            <button class="nav-tab" data-zone="stickers">
+                <span class="tab-icon">🏆</span>
+                <span>אַלְבּוֹם מַדְבְּקוֹת</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- אזור הינשוף המלווה "קִרְאִי" -->
+    <section class="mascot-banner">
+        <div class="mascot-card">
+            <div class="mascot-avatar" id="mascot-avatar-display">🦉</div>
+            <div class="mascot-speech">
+                <div class="mascot-name">קִרְאִי הַיַנְשׁוּף הֶחָכָם:</div>
+                <div class="mascot-text" id="mascot-text-display">
+                    שָׁלוֹם חָבֵר! אֵיזֶה כֵּיף שֶׁבָּאתָ לִקְרוֹא אִתִּי! בְּאֵיזוֹ פְּעִילוּת נַתְחִיל הַיּוֹם?
+                </div>
+            </div>
+            <button class="mascot-speak-btn" id="mascot-speak-btn" title="הקרא את ההודעה">
+                📢
+            </button>
+        </div>
+    </section>
+
+    <!-- גוף התוכן הראשי (אזורי משחק) -->
+    <main class="main-content">
+
+        <!-- ===================================================================
+             1. אזור האותיות והצלילים
+             =================================================================== -->
+        <section class="game-zone active" id="zone-letters">
+            <div class="zone-header">
+                <h2 class="zone-title">🏰 מַמְלֶכֶת הָאוֹתִיּוֹת וְהַצְּלִילִים</h2>
+                <p class="zone-subtitle">לַחֲצוּ עַל כָּל אוֹת כְּדֵי לִשְׁמֹעַ אֶת הַצְּלִיל וּלְגַלּוֹת מִילָה קְסוּמָה!</p>
+            </div>
+
+            <!-- סינון אותיות -->
+            <div class="letters-filter-bar">
+                <button class="filter-btn active" data-filter="all">כָּל הָאוֹתִיּוֹת (27)</button>
+                <button class="filter-btn" data-filter="regular">אוֹתִיּוֹת רְגִילוֹת</button>
+                <button class="filter-btn" data-filter="sofit">אוֹתִיּוֹת סוֹפִיּוֹת (ך, ם, ן, ף, ץ)</button>
+            </div>
+
+            <!-- רשת קלפי האותיות -->
+            <div class="letters-grid" id="letters-grid-container">
+                <!-- נטען דינמית דרך app.js -->
+            </div>
+        </section>
+
+        <!-- ===================================================================
+             2. ממלכת הניקוד
+             =================================================================== -->
+        <section class="game-zone" id="zone-vowels">
+            <div class="zone-header">
+                <h2 class="zone-title">👑 אֶרֶץ הַתְּנוּעוֹת וְהַנִּיקּוּד</h2>
+                <p class="zone-subtitle">הַנִּיקּוּד מְלַמֵּד אֶת הָאוֹתִיּוֹת אֵיךְ לָשִׁיר! לַחֲצוּ וְתִשְׁמְעוּ כָּל תְּנוּעָה.</p>
+            </div>
+
+            <div class="vowels-showcase" id="vowels-cards-container">
+                <!-- נטען דינמית דרך app.js -->
+            </div>
+        </section>
+
+        <!-- ===================================================================
+             3. מרכיב המילים (מעבדת ההברות)
+             =================================================================== -->
+        <section class="game-zone" id="zone-syllables">
+            <div class="zone-header">
+                <h2 class="zone-title">🧩 מַעְבֶּדֶת הַהֲבָרוֹת וְהַמִּילִים</h2>
+                <p class="zone-subtitle">הַרְכִּיבוּ אֶת הַמִּילָה עַל יְדֵי לְחִיצָה עַל הַהֲבָרוֹת בַּסֵּדֶר הַנָּכוֹן!</p>
+            </div>
+
+            <div class="builder-container">
+                <div class="builder-header">
+                    <span class="badge" id="builder-level-indicator">שָׁלָב 1 מִתּוֹךְ 12</span>
+                    <button class="btn-secondary" id="builder-listen-word-btn">🔊 הַשְׁמַע מִילָה</button>
+                </div>
+
+                <div class="word-target-card">
+                    <div class="word-target-emoji" id="builder-target-emoji">🎈</div>
+                    <div class="word-target-hint" id="builder-target-hint">רֶמֶז יַגִּיעַ כָּאן...</div>
+                </div>
+
+                <!-- משבצות להרכבת המילה -->
+                <div class="word-slots-container" id="builder-slots-container">
+                    <!-- משבצות דינמיות -->
+                </div>
+
+                <div class="syllables-bank-title">בַּחֲרוּ אֶת הַהֲבָרָה הַבָּאָה:</div>
+                <div class="syllables-bank" id="builder-bank-container">
+                    <!-- כפתורי הברות דינמיים -->
+                </div>
+
+                <div class="builder-actions">
+                    <button class="btn-secondary" id="builder-reset-btn">🔄 נַסֶּה מֵחָדָשׁ</button>
+                    <button class="btn-primary" id="builder-next-btn" style="display: none;">הַמִּילָה הַבָּאָה! 🌟</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================================================================
+             4. אתגר פיצוץ בועות צליל
+             =================================================================== -->
+        <section class="game-zone" id="zone-bubbles">
+            <div class="zone-header">
+                <h2 class="zone-title">🫧 אֲתַגַּר פִּצּוּץ הַבּוּעוֹת</h2>
+                <p class="zone-subtitle">הַקְשִׁיבוּ לַצְּלִיל שֶׁקִּרְאִי אוֹמֵר, וּפוֹצְצוּ אֶת הַבּוּעָה הַמַּתְאִימָה!</p>
+            </div>
+
+            <div class="bubble-arena" id="bubble-arena">
+                <div class="bubble-arena-top">
+                    <div class="bubble-target-box">
+                        <span>צְלִיל לְחִפּוּשׂ:</span>
+                        <span id="bubble-target-sound" style="color: #E11D48; font-size: 1.6rem;">---</span>
+                        <button class="icon-btn" id="bubble-repeat-sound-btn" style="width:34px; height:34px;" title="השמע שוב צליל">🔊</button>
+                    </div>
+                    <div class="bubble-target-box">
+                        <span>נְקֻדּוֹת:</span>
+                        <span id="bubble-score">0</span>
+                    </div>
+                </div>
+
+                <!-- שכבת פתיחה למשחק הבועות -->
+                <div class="bubble-start-overlay" id="bubble-start-overlay">
+                    <div style="font-size: 4rem;">🫧🎯</div>
+                    <h3>מוּכָנִים לְפַצֵּץ בּוּעוֹת?</h3>
+                    <p style="font-size: 1.15rem; color: #475569; max-width: 400px;">
+                        הַקְשִׁיבוּ לַצְּלִיל וּפוֹצְצוּ רַק אֶת הַבּוּעוֹת הַנְּכוֹנוֹת כְּדֵי לִזְכּוֹת בְּכוֹכָבִים!
+                    </p>
+                    <button class="btn-primary" id="bubble-start-btn" style="font-size: 1.3rem;">
+                        הַתְחֵל מִשְׂחָק! 🚀
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================================================================
+             5. ספריית הסיפורים המדורגת לפי שלבי הניקוד
+             =================================================================== -->
+        <section class="game-zone" id="zone-stories">
+            <div class="zone-header">
+                <h2 class="zone-title">📚 סִפְרִיַּת הַקְּרִיאָה הַמְּדֹרֶגֶת</h2>
+                <p class="zone-subtitle">מַתְחִילִים עִם קָמָץ-פַּתָּח, וּבְכָל שָׁלָב מוֹסִיפִים תְּנוּעָה חֲדָשָׁה עַד לִקְרִיאָה שׁוֹטֶפֶת!</p>
+            </div>
+
+            <!-- סינון לפי שלבי ניקוד -->
+            <div class="stories-filter-bar">
+                <button class="filter-btn active" data-story-filter="all">כָּל הַשְּׁלָבִים (6)</button>
+                <button class="filter-btn" data-story-filter="kamatz-patach">שָׁלָב 1: קָמָץ-פַּתָּח</button>
+                <button class="filter-btn" data-story-filter="chiriq">שָׁלָב 2: + חִירִיק</button>
+                <button class="filter-btn" data-story-filter="cholam">שָׁלָב 3: + חוֹלָם</button>
+                <button class="filter-btn" data-story-filter="shuruk">שָׁלָב 4: + שׁוּרוּק</button>
+                <button class="filter-btn" data-story-filter="segol">שָׁלָב 5: + סֶגוֹל-צֵירֵה</button>
+                <button class="filter-btn" data-story-filter="fluent">שָׁלָב 6: כִּתָּה ב׳</button>
+            </div>
+
+            <!-- רשימת כרטיסי הסיפורים -->
+            <div class="stories-list" id="stories-grid-container">
+                <!-- נטען דינמית -->
+            </div>
+
+            <!-- תצוגת קריאת סיפור פעיל -->
+            <div class="story-reader-view" id="story-reader-view">
+                <div class="reader-header">
+                    <div>
+                        <span class="story-badge" id="reader-story-badge">כִּתָּה א׳</span>
+                        <span class="story-vowels-pill" id="reader-vowels-pill" style="margin-right: 8px;">תְּנוּעוֹת</span>
+                        <h3 id="reader-story-title" style="font-size: 1.9rem; font-weight: 800; font-family: 'Assistant', sans-serif; margin-top: 6px;">כּוֹתֶרֶת</h3>
+                    </div>
+                    <button class="btn-secondary" id="reader-back-btn">⬅️ חֲזָרָה לַסִּפְרִיָּה</button>
+                </div>
+
+                <!-- משפטי הסיפור המנוקדים -->
+                <div class="reader-sentences" id="reader-sentences-container">
+                    <!-- מילים מנוקדות הניתנות להקראה ולהדגשת קריוקי -->
+                </div>
+
+                <!-- כפתורי שליטה בהקראה -->
+                <div class="reader-controls">
+                    <button class="btn-primary" id="reader-play-btn">
+                        <span>▶️</span>
+                        <span>קְרָא לִי אֶת הַסִּפּוּר</span>
+                    </button>
+                    <button class="btn-secondary" id="reader-stop-btn">
+                        <span>⏹️</span>
+                        <span>עֲצֹר הַקְרָאָה</span>
+                    </button>
+                </div>
+
+                <!-- שאלת הבנת הנקרא -->
+                <div class="story-quiz-box" id="story-quiz-box">
+                    <h4 id="story-quiz-question">שְׁאֵלַת הֲבָנָה...</h4>
+                    <div class="quiz-options-list" id="story-quiz-options">
+                        <!-- אפשרויות תשובה -->
+                    </div>
+                    <div id="story-quiz-feedback" style="margin-top: 15px; font-weight: 800; font-size: 1.1rem; display: none;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================================================================
+             6. אלבום המדבקות וההישגים
+             =================================================================== -->
+        <section class="game-zone" id="zone-stickers">
+            <div class="zone-header">
+                <h2 class="zone-title">🏆 אַלְבּוֹם הַמַּדְבְּקוֹת וְהַפְּרָסִים</h2>
+                <p class="zone-subtitle">כָּל פְּעִילוּת מַעֲנִיקָה כּוֹכָבִים שֶׁפּוֹתְחִים מַדְבְּקוֹת קְסוּמוֹת!</p>
+                
+                <!-- תעודת הקורא המצטיין האישית -->
+                <div class="child-certificate-banner" id="child-certificate-banner">
+                    <div class="cert-icon">🎖️</div>
+                    <div class="cert-text">
+                        <div class="cert-title">תְּעוּדַת הַקּוֹרֵא הַמִּצְטַיֵּן מוּעֲנֶקֶת לְ:</div>
+                        <div class="cert-name" id="cert-child-name">הַקּוֹרֵא הָאַלּוּף</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stickers-grid" id="stickers-grid-container">
+                <!-- נטען דינמית דרך app.js -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- =======================================================================
+         מודאל פרטי אות מורחב (Letter Detail Modal)
+         ======================================================================= -->
+    <div class="modal-backdrop" id="letter-modal">
+        <div class="modal-window">
+            <button class="modal-close-btn" onclick="app.closeModal('letter-modal')">✕</button>
+            <div id="letter-modal-char" style="font-size: 5rem; font-weight: 900; color: #4F46E5; font-family: 'Rubik';">א</div>
+            <h3 id="letter-modal-name" style="font-size: 1.8rem; margin: 5px 0;">שֵׁם הָאוֹת</h3>
+            <div id="letter-modal-emoji" style="font-size: 3.5rem; margin: 10px 0;">🐇</div>
+            <div id="letter-modal-word" style="font-size: 2rem; font-weight: 800; color: #E11D48;">מִילָה</div>
+            <p id="letter-modal-hint" style="font-size: 1.05rem; color: #475569; margin: 15px 0; background: #F8FAFC; padding: 12px; border-radius: 12px;">רמז...</p>
+            <button class="btn-primary" id="letter-modal-speak-btn" style="margin: 0 auto;">
+                🔊 הַשְׁמַע צְלִיל וּמִילָה
+            </button>
+        </div>
+    </div>
+
+    <!-- =======================================================================
+         מודאל פרופיל: שם הילד ובחירת דמות (Child Name & Avatar Modal)
+         ======================================================================= -->
+    <div class="modal-backdrop" id="profile-modal">
+        <div class="modal-window profile-modal-window">
+            <button class="modal-close-btn" onclick="app.closeModal('profile-modal')">✕</button>
+            <h3 style="font-size: 1.6rem; color: #4F46E5; margin-bottom: 6px;">הַפְּרוֹפִיל שֶׁלִּי 🌟</h3>
+            <p style="color: #64748B; font-size: 0.95rem; margin-bottom: 20px;">הַכְנִיסוּ אֶת שֵׁם הַיֶּלֶד/ה וּבַחֲרוּ אֶת הַדְּמוּת הָאֲהוּבָה עֲלֵיכֶם!</p>
+            
+            <!-- שדה הזנת שם הילד -->
+            <div class="name-input-group">
+                <label for="child-name-input" class="input-label">מָה הַשֵּׁם שֶׁלְּךָ / שֶׁלָּךְ?</label>
+                <div class="name-input-wrapper">
+                    <input type="text" id="child-name-input" maxlength="20" placeholder="למשל: דָּנִיאֵל, נוֹעָה, אוֹרִי..." autocomplete="off">
+                </div>
+            </div>
+
+            <!-- בחירת דמות -->
+            <div class="avatar-selection-group">
+                <div class="input-label">בַּחֲרוּ דְּמוּת אֲהוּבָה:</div>
+                <div class="avatars-grid">
+                    <button class="avatar-option-btn icon-btn" data-avatar="👦" onclick="app.selectAvatarChoice('👦')">👦</button>
+                    <button class="avatar-option-btn icon-btn" data-avatar="👧" onclick="app.selectAvatarChoice('👧')">👧</button>
+                    <button class="avatar-option-btn icon-btn" data-avatar="🦁" onclick="app.selectAvatarChoice('🦁')">🦁</button>
+                    <button class="avatar-option-btn icon-btn" data-avatar="🦊" onclick="app.selectAvatarChoice('🦊')">🦊</button>
+                    <button class="avatar-option-btn icon-btn" data-avatar="🤖" onclick="app.selectAvatarChoice('🤖')">🤖</button>
+                    <button class="avatar-option-btn icon-btn" data-avatar="🦉" onclick="app.selectAvatarChoice('🦉')">🦉</button>
+                </div>
+            </div>
+
+            <div style="margin-top: 25px;">
+                <button class="btn-primary" id="save-profile-btn" style="width: 100%; justify-content: center;" onclick="app.saveProfile()">
+                    <span>שְׁמוֹר וְהַתְחֵל לִקְרוֹא!</span>
+                    <span>🚀</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =======================================================================
+         מודאל בחירת קול ומבטא עברי (Hebrew Voice Settings Modal)
+         ======================================================================= -->
+    <div class="modal-backdrop" id="voice-modal">
+        <div class="modal-window profile-modal-window">
+            <button class="modal-close-btn" onclick="app.closeModal('voice-modal')">✕</button>
+            <h3 style="font-size: 1.6rem; color: #4F46E5; margin-bottom: 6px;">הַגְדָּרוֹת קוֹל וּמִבְטָא 🗣️</h3>
+            <p style="color: #64748B; font-size: 0.95rem; margin-bottom: 20px;">בַּחֲרוּ קוֹל דּוֹבֵר עִבְרִית בְּמִבְטָא יִשְׂרְאֵלִי טִבְעִי לַהַקְרָאָה!</p>
+
+            <div class="voice-picker-group">
+                <label for="voice-select-dropdown" class="input-label">בַּחֲרוּ קוֹל עִבְרִי מֵהַמַּחְשֵׁב / הַטַּלְפוֹן:</label>
+                <select id="voice-select-dropdown" class="voice-select-dropdown">
+                    <!-- נטען דינמית -->
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin: 20px 0; justify-content: center;">
+                <button type="button" class="btn-secondary" id="test-voice-btn" style="flex: 1; justify-content: center;" onclick="app.testSelectedVoice()">
+                    <span>🔊 בְּדִיקַת קוֹל</span>
+                </button>
+                <button type="button" class="btn-primary" id="save-voice-btn" style="flex: 1; justify-content: center;" onclick="app.saveVoiceSelection()">
+                    <span>שְׁמוֹר קוֹל 💾</span>
+                </button>
+            </div>
+
+            <!-- תיבת טיפ להגדרת קולות טבעיים -->
+            <div class="voice-tip-box">
+                <div style="font-size: 1.4rem;">💡</div>
+                <div style="text-align: right;">
+                    <strong style="color: #92400E; display: block; margin-bottom: 3px;">טִיפּ לִקְרִיאָה בְּמִבְטָא מוּשְׁלָם:</strong>
+                    <p style="font-size: 0.88rem; color: #78350F; line-height: 1.4; margin: 0;">
+                        בִּדְפַדְפַן Microsoft Edge מוּבְנִים קוֹלוֹת טִבְעִיִּים בְּאֵיכוּת שִׂיא: <em>Avri Natural</em> וְ-<em>Hila Natural</em>. מַמְלִיצִים מְאוֹד לִבְחוֹר בָּהֶם!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =======================================================================
+         מודאל פרס ומדבקה חדשה (Reward Celebration Modal)
+         ======================================================================= -->
+    <div class="modal-backdrop" id="reward-modal">
+        <div class="modal-window">
+            <div style="font-size: 5rem; animation: gentle-bounce 1s infinite;">🎉</div>
+            <h3 style="font-size: 1.8rem; color: #D97706; margin-bottom: 8px;">מַדְבָּקָה חֲדָשָׁה נִפְתְּחָה!</h3>
+            <div id="reward-modal-icon" style="font-size: 4.5rem; margin: 15px 0;">🏆</div>
+            <h4 id="reward-modal-title" style="font-size: 1.4rem; color: #1E293B;">אַלּוּף הַקְּרִיאָה</h4>
+            <p id="reward-modal-desc" style="color: #64748B; margin: 10px 0 20px;">הִשְׁלַמְתָּ אֶת הַיַּעַד בְּהַצְלָחָה!</p>
+            <button class="btn-primary" onclick="app.closeModal('reward-modal')" style="margin: 0 auto;">
+                אֵיזֶה כֵּיף! תּוֹדָה 🌟
+            </button>
+        </div>
+    </div>
+
+    <!-- סקריפטים -->
+    <script src="reading-data.js"></script>
+    <script src="sound-effects.js"></script>
+    <script src="app.js"></script>
+
+    <!-- רישום Service Worker לעבודה אופליין -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(function(reg) { console.log('SW registered:', reg.scope); })
+                    .catch(function(err) { console.log('SW failed:', err); });
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4F46E5"/>
+      <stop offset="50%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#EC4899"/>
+    </linearGradient>
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FCD34D"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- הרקע המעוגל של סמל האפליקציה -->
+  <rect width="512" height="512" rx="115" fill="url(#bgGradient)"/>
+
+  <!-- הילה של כוכבים וניצוצות ברקע -->
+  <g fill="#FFF" opacity="0.35">
+    <circle cx="90" cy="110" r="14"/>
+    <circle cx="430" cy="130" r="16"/>
+    <circle cx="390" cy="390" r="12"/>
+    <circle cx="110" cy="400" r="10"/>
+  </g>
+
+  <!-- ספר קריאה פתוח מתחת לינשוף -->
+  <g filter="url(#shadow)" transform="translate(106, 320)">
+    <path d="M 150 20 Q 220 -10 290 10 L 290 80 Q 220 60 150 90 L 10 90 Q 80 60 150 20 Z" fill="#FFFFFF"/>
+    <path d="M 150 20 Q 80 -10 10 10 L 10 80 Q 80 60 150 90 Z" fill="#F1F5F9"/>
+    <path d="M 150 20 L 150 90" stroke="#CBD5E1" stroke-width="4"/>
+    <!-- אותיות עבריות מרחפות מהספר: א, ב, ג -->
+    <text x="70" y="55" font-family="Rubik, Arial" font-size="34" font-weight="900" fill="#4F46E5" text-anchor="middle">אָ</text>
+    <text x="230" y="55" font-family="Rubik, Arial" font-size="34" font-weight="900" fill="#EC4899" text-anchor="middle">בָּ</text>
+  </g>
+
+  <!-- דמות הינשוף "קראי" -->
+  <g filter="url(#shadow)" transform="translate(136, 90)">
+    <!-- גוף הינשוף -->
+    <ellipse cx="120" cy="150" rx="95" ry="110" fill="#FFFBEB"/>
+    <ellipse cx="120" cy="150" rx="85" ry="98" fill="#FEF3C7"/>
+
+    <!-- כנפיים -->
+    <path d="M 35 150 Q 15 200 45 220 Q 55 180 50 150 Z" fill="#F59E0B"/>
+    <path d="M 205 150 Q 225 200 195 220 Q 185 180 190 150 Z" fill="#F59E0B"/>
+
+    <!-- אוזניים / נוצות ראש -->
+    <polygon points="50,60 80,10 95,70" fill="#D97706"/>
+    <polygon points="190,60 160,10 145,70" fill="#D97706"/>
+
+    <!-- עיניים גדולות של ינשוף חכם -->
+    <circle cx="80" cy="120" r="38" fill="#FFFFFF" stroke="#FDE68A" stroke-width="6"/>
+    <circle cx="160" cy="120" r="38" fill="#FFFFFF" stroke="#FDE68A" stroke-width="6"/>
+
+    <!-- אישונים מנצנצים -->
+    <circle cx="85" cy="122" r="20" fill="#1E293B"/>
+    <circle cx="155" cy="122" r="20" fill="#1E293B"/>
+    <circle cx="78" cy="115" r="7" fill="#FFFFFF"/>
+    <circle cx="148" cy="115" r="7" fill="#FFFFFF"/>
+
+    <!-- מקור כתום וחמוד -->
+    <polygon points="120,135 110,158 130,158" fill="#EA580C"/>
+
+    <!-- כתר זהב קטן על הראש -->
+    <polygon points="105,45 113,20 120,35 127,20 135,45" fill="url(#goldGradient)" stroke="#D97706" stroke-width="2"/>
+    <circle cx="120" cy="15" r="4" fill="#EF4444"/>
+  </g>
+
+  <!-- כוכב נוצץ בפינה העליונה -->
+  <polygon points="410,70 418,90 440,92 422,106 428,128 410,114 392,128 398,106 380,92 402,90" fill="url(#goldGradient)"/>
+</svg>
